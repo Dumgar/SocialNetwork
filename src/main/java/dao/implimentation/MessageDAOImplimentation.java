@@ -10,7 +10,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * JDBC DAO implementations
+ *
+ * @author Roman Dmitriev
+ */
 public class MessageDAOImplimentation implements MessageDAO {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<User> getDialogues(int id) throws SQLException {
         List<User> list = new ArrayList<>();
@@ -27,6 +35,9 @@ public class MessageDAOImplimentation implements MessageDAO {
         return list;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteDialogue(int sender, int receiver) throws SQLException {
         try (Connection con = DBConnectionManager.getConnection();
@@ -35,6 +46,9 @@ public class MessageDAOImplimentation implements MessageDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Message> getMessages(HttpServletRequest request, int sender, int receiver) throws SQLException {
         List<Message> list = new ArrayList<>();
@@ -60,6 +74,9 @@ public class MessageDAOImplimentation implements MessageDAO {
         return list;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Message createMessage(String message, int sender, int receiver) throws SQLException {
 
@@ -75,6 +92,13 @@ public class MessageDAOImplimentation implements MessageDAO {
         return newMessage;
     }
 
+    /**
+     * Creates Prepared Statement for getting list of dialogues
+     * @param connection SQL connection
+     * @param sender Current user
+     * @return Prepared Statement
+     * @throws SQLException
+     */
     private PreparedStatement createPSDialogues(Connection connection, int sender) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("SELECT m.sender AS id, u.firstname, u.lastname, u.email,\n" +
                 " u.birthdate, u.country, u.city, u.photoid FROM messages m JOIN Users u ON m.sender = u.id WHERE m.receiver=? \n" +
@@ -85,6 +109,15 @@ public class MessageDAOImplimentation implements MessageDAO {
         ps.setInt(2, sender);
         return ps;
     }
+
+    /**
+     * Creates Prepared Statement for deleting all messages between users
+     * @param connection SQL connection
+     * @param sender Current user
+     * @param receiver interlocutor
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSDelete(Connection connection, int sender, int receiver) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("DELETE FROM messages WHERE (sender=? AND receiver=?) \n" +
                 "OR (sender=? AND receiver=?)");
@@ -94,6 +127,15 @@ public class MessageDAOImplimentation implements MessageDAO {
         ps.setInt(4, sender);
         return ps;
     }
+
+    /**
+     * Creates Prepared Statement for getting list of messages between users
+     * @param connection SQL connection
+     * @param sender Current user
+     * @param receiver interlocutor
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSGetMessages(Connection connection, int sender, int receiver) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("SELECT m.id, m.message, m.sender, m.receiver, u.firstname, u.lastname\n" +
                 "FROM messages m JOIN users u ON m.receiver = u.id WHERE m.sender=? AND m.receiver=?\n" +
@@ -107,6 +149,15 @@ public class MessageDAOImplimentation implements MessageDAO {
         return ps;
     }
 
+    /**
+     * Creates Prepared Statement for new message
+     * @param connection SQL connection
+     * @param message Message
+     * @param sender Current user
+     * @param receiver interlocutor
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSNewMessage(Connection connection, String message, int sender, int receiver) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("INSERT INTO messages(message, sender, receiver) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, message);

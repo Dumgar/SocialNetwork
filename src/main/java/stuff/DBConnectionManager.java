@@ -7,10 +7,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Created by romandmitriev on 05.08.16.
+ * Provides connections from TomCat connection pool
+ *
+ * @author Roman Dmitriev
  */
 public class DBConnectionManager {
 
+    /**
+     * Factory for connections for the physical source
+     * {@code DataSource} object
+     */
     private static DataSource dataSource;
 
     static {
@@ -21,6 +27,11 @@ public class DBConnectionManager {
         }
     }
 
+    /**
+     * Gets connection from {@code DataSource} object
+     * @return connection object
+     * @throws SQLException
+     */
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }

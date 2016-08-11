@@ -10,15 +10,30 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by romandmitriev on 08.08.16.
+ * Definition of the custom JSTL tag for displaying list of users
+ *
+ * @author Roman Dmitriev
  */
 public class ListOfUsersTag extends TagSupport{
+    /**
+     * Custom tag attribute
+     */
     private List<User> list;
 
+    /**
+     * @param list of users
+     */
     public void setList(List<User> list) {
         this.list = list;
     }
 
+    /**
+     * Processing of the start tag that writes list of users to the
+     * JspWriter's buffer or, if no buffer is used, directly to the
+     * underlying writer.
+     *
+     * @return SKIP_BODY
+     */
     @Override
     public int doStartTag() throws JspException {
 
@@ -36,6 +51,11 @@ public class ListOfUsersTag extends TagSupport{
         return SKIP_BODY;
     }
 
+    /**
+     * Creates String object comprising hyperlink to user's profile
+     * @param user object
+     * @return String object
+     */
     private String getString(User user) {
 
         HttpServletResponse response = (HttpServletResponse)pageContext.getResponse();

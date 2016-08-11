@@ -17,4 +17,8 @@
       method="get">
     <input type="submit" value="Profile">
 </form>
+<form action="logout"
+      method="post">
+    <input type="submit" value="Logout">
+</form>
 

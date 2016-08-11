@@ -14,9 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by romandmitriev on 07.08.16.
+ * JDBC DAO implementations
+ *
+ * @author Roman Dmitriev
  */
 public class SearchImplimentation implements Search {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List doSearchByName(String name) {
         List<User> users = new ArrayList<>();
@@ -38,6 +43,9 @@ public class SearchImplimentation implements Search {
         return users;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List doMessageSearch(HttpServletRequest request, String message, int sender) {
         List<Message> list = new ArrayList<>();
@@ -65,6 +73,13 @@ public class SearchImplimentation implements Search {
         return list;
     }
 
+    /**
+     * Creates Prepared Statement for user searching
+     * @param connection SQL connection
+     * @param name Search string
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSSearchByName(Connection connection, String name) throws SQLException {
         name = name.replaceAll("\\W|\\d", "");
 //        name = name.replace("%", "");
@@ -72,6 +87,15 @@ public class SearchImplimentation implements Search {
         preparedStatement.setString(1, name + "*");
         return preparedStatement;
     }
+
+    /**
+     * Creates Prepared Statement for message searching
+     * @param connection SQL connection
+     * @param message Search string
+     * @param sender Current user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSMessage(Connection connection, String message, int sender) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("SELECT m.sender, m.receiver, m.message, u.firstname, u.lastname\n" +
                 " FROM messages m JOIN Users u ON m.sender=u.id WHERE m.receiver=? AND MATCH (message) AGAINST (?)\n" +

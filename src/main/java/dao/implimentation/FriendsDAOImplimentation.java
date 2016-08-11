@@ -12,9 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by romandmitriev on 08.08.16.
+ * JDBC DAO implementations
+ *
+ * @author Roman Dmitriev
  */
 public class FriendsDAOImplimentation implements FriendsDAO {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void addFriend(int friending, int friended) throws SQLException {
         try (Connection con = DBConnectionManager.getConnection();
@@ -23,6 +28,9 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteFriend(int friending, int friended) throws SQLException {
         try (Connection con = DBConnectionManager.getConnection();
@@ -31,6 +39,9 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void declineStatus(int friending, int friended) throws SQLException {
 
@@ -40,6 +51,9 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void acceptStatus(int friending, int friended) throws SQLException {
 
@@ -49,6 +63,9 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<User> getFriends(int friending) throws SQLException {
         List<User> list = new ArrayList<>();
@@ -65,6 +82,9 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         return list;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<User> getStatusList(int friending) throws SQLException {
 
@@ -81,6 +101,15 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         }
         return list;
     }
+
+    /**
+     * Creates Prepared Statement for new friends request
+     * @param connection SQL connection
+     * @param friending Current user
+     * @param friended requested user
+     * @return PreparedStatement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSAdd(Connection connection, int friending, int friended) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("INSERT INTO friends (friending, friended, status) VALUES (?, ?, 0)");
         ps.setInt(1, friending);
@@ -88,6 +117,14 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         return ps;
     }
 
+    /**
+     * Creates Prepared Statement for deleting user
+     * @param connection SQL connection
+     * @param friending Current user
+     * @param friended Deleting user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSDelete(Connection connection, int friending, int friended) throws SQLException {
         PreparedStatement ps = connection.prepareStatement("DELETE FROM friends WHERE (friending=? AND friended=?) " +
                 "OR (friending=? AND friended=?)");
@@ -97,18 +134,44 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         ps.setInt(4, friending);
         return ps;
     }
+
+    /**
+     * Creates Prepared Statement for declining friend request
+     * @param connection SQL connection
+     * @param friending Current user
+     * @param friended Requesting user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSDecline(Connection connection, int friending, int friended) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("DELETE FROM friends WHERE friending=? AND friended=?");
         ps.setInt(1, friended);
         ps.setInt(2, friending);
         return ps;
     }
+
+    /**
+     * Creats Prepared Statement for accepting friend request
+     * @param connection SQL connection
+     * @param friending Current user
+     * @param friended Requesting user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSAccept(Connection connection, int friending, int friended) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("UPDATE friends SET status=1 WHERE friending=? AND friended=?");
         ps.setInt(1, friended);
         ps.setInt(2, friending);
         return ps;
     }
+
+    /**
+     * Creates Prepared Statement for getting list of friends
+     * @param connection SQL connection
+     * @param friending Current user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSFriends(Connection connection, int friending) throws SQLException {
         PreparedStatement ps = connection.prepareStatement("SELECT f.friending AS id, u.firstname, u.lastname, u.email, u.birthdate, u.country, u.city, u.photoid FROM friends f JOIN Users u ON f.friending = u.id WHERE f.friended=? AND f.status=1\n" +
                 "UNION\n" +
@@ -117,6 +180,14 @@ public class FriendsDAOImplimentation implements FriendsDAO {
         ps.setInt(2, friending);
         return ps;
     }
+
+    /**
+     * Creates Prepared Statement for getting list of friend requests
+     * @param connection SQL connection
+     * @param friending Current user
+     * @return Prepared Statement Object
+     * @throws SQLException
+     */
     private PreparedStatement createPSStatus(Connection connection, int friending) throws SQLException{
         PreparedStatement ps = connection.prepareStatement("SELECT f.friending AS id, u.firstname, u.lastname, u.email, u.birthdate, u.country, u.city, u.photoid FROM friends f JOIN Users u ON f.friending = u.id WHERE f.friended=? AND f.status=0 ORDER BY firstname");
         ps.setInt(1, friending);

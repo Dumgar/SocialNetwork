@@ -5,6 +5,11 @@
         <welcome-file>login.jsp</welcome-file>
     </welcome-file-list>
 
+    <context-param>
+        <param-name>log4j-config</param-name>
+        <param-value>META-INF/log4j.xml</param-value>
+    </context-param>
+
     <resource-ref>
         <description>DB Connection</description>
         <res-ref-name>jdbc/socialnetwork</res-ref-name>
